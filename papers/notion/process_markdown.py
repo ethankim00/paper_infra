@@ -46,8 +46,8 @@ class Markdown:
 
         header = [
             "---\n",
-            "title: {}\n".format(title),
-            "date: {}\n".format(get_datetime()),
+            'title: "{}"\n'.format(title),
+            "last_modified_at: {}\n".format(get_datetime()),
             "categories: {}\n".format("paper_review"),
             "tags:\n",
         ]
