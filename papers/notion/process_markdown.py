@@ -66,15 +66,32 @@ class Markdown:
                     + "/assets/images/{}".format(self.file_name)
                     + line[start_index:]
                 )
-                lines[idx] = line.replace(self.stem, "")
+                lines[idx] = line.replace(self.stem, "").replace("%20", " ")
 
         return lines
 
     def write(self):
-        filename = self.file_name + ".md"
+        date_string = datetime.now().strftime("%Y-%m-%d")
+        filename = date_string + "-" + self.file_name + ".md"
         with open(filename, "w") as out:
             out.writelines(self.lines)
 
 
-md_file = Markdown("./Export-c7fc191c-c63d-4e33-ba68-6b44fb352857/Transforme 19732.md")
+# pain points
+# read export folder from downloads
+# rename image folder
+# replace %20 check
+# move to website folder
+
+# or use github api
+posts_path = "~/Desktop/Website/ethankim00.github.io/_posts"
+images_path = "~/Desktop/Website"
+
+
+file_path = "./NoisyTune  65e31.md"
+md_file = Markdown(file_path)
 md_file.convert()
+image_file_path = file_path[:-3]
+import subprocess
+
+subprocess.run(["mv", image_file_path, md_file.file_name + "/"])
