@@ -5,6 +5,9 @@
 # - list the most recent entries
 # - choose which page to download
 # - download the markdown file for that page
+import os
+import argparse
+import subprocess
 from typing import List
 from datetime import datetime
 from pathlib import Path
@@ -83,15 +86,48 @@ class Markdown:
 # replace %20 check
 # move to website folder
 
+
 # or use github api
 posts_path = "~/Desktop/Website/ethankim00.github.io/_posts"
 images_path = "~/Desktop/Website"
-
-
 file_path = "./NoisyTune  65e31.md"
 md_file = Markdown(file_path)
 md_file.convert()
 image_file_path = file_path[:-3]
-import subprocess
+
 
 subprocess.run(["mv", image_file_path, md_file.file_name + "/"])
+
+
+def parse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--input_file_path",
+        type=str,
+        help="System path to markdown download",
+        required=False,
+    )
+    parser.add_argument("--publish", type=bool, default=True)
+
+
+temp_folder = Path(__file__).parent.joinpath("tmp")
+
+if __name__ == "__main__":
+    # default to reading latest file from dowloads folder
+    args = parse()
+    if not args.input_file_path:
+        list_of_paths = Path("~/Downloads/").glob("*")
+        folder_path = max(list_of_paths, key=lambda p: p.stat().st_ctime)
+    else:
+        folder_path = Path(args.input_file_path)
+
+    # copy markdown and image folder to local temp
+    dir_name = os.listdir(folder_path)
+    subprocess.run("cp", folder_path.joinpath("*.md"), temp_folder.joinpath("_posts"))
+    subprocess.run("cp", folder_path.joinpath(), temp_folder.joinpath("assets/images"))
+
+    # run processing
+
+    # push to github
+
+    # delete temp files
