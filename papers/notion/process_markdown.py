@@ -13,6 +13,29 @@ from datetime import datetime
 from pathlib import Path
 
 
+
+
+
+def fetch_explort(file_path: str = None)
+    temp_folder = Path(__file__).parent.joinpath("tmp")
+    folder_path = Path("../../../Downloads/")
+    assert folder_path.is_dir()
+    if not file_path:
+        export_files = list(folder_path.glob("Export-*"))
+        most_recent_folder = max(export_files, key=os.path.getctime)
+        folder_path = Path(most_recent_folder)
+    else:
+        folder_path = folder_path.joinpath(file_path)
+    try:
+        subprocess.run(
+            ["mv", next(folder_path.glob("*.md")), temp_folder.joinpath("_posts")]
+        )
+    except:
+        pass
+    subprocess.run(
+        ["mv", next(folder_path.glob("*/")), temp_folder.joinpath("assets/images")]
+    )
+
 def get_datetime():
     """Get current datetime in minimal mistakes format"""
     date_string = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
