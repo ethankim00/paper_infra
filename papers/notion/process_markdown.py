@@ -8,15 +8,17 @@
 import os
 import argparse
 import subprocess
+import logging
 from typing import List
 from datetime import datetime
 from pathlib import Path
 
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
-
-def fetch_explort(file_path: str = None)
+def fetch_export(file_path: str = None) -> Path:
     temp_folder = Path(__file__).parent.joinpath("tmp")
     folder_path = Path("../../../Downloads/")
     assert folder_path.is_dir()
@@ -26,15 +28,18 @@ def fetch_explort(file_path: str = None)
         folder_path = Path(most_recent_folder)
     else:
         folder_path = folder_path.joinpath(file_path)
+    print(folder_path)
+    markdown_path = next(folder_path.glob("*.md"))
     try:
-        subprocess.run(
-            ["mv", next(folder_path.glob("*.md")), temp_folder.joinpath("_posts")]
-        )
+        subprocess.run(["mv", markdown_path, temp_folder.joinpath("_posts")])
     except:
         pass
     subprocess.run(
         ["mv", next(folder_path.glob("*/")), temp_folder.joinpath("assets/images")]
     )
+    logging.info("Copied Files to local temp directory")
+    return Path(markdown_path.stem)
+
 
 def get_datetime():
     """Get current datetime in minimal mistakes format"""
@@ -43,26 +48,40 @@ def get_datetime():
 
 
 class Markdown:
-    def __init__(self, file_path: str):
-        self.file_path = file_path
+    def __init__(
+        self, file_path: str, temp_folder: Path = Path(__file__).parent.joinpath("tmp")
+    ):
+        self.temp_folder = temp_folder
+        self.file_path = (
+            self.temp_folder.joinpath("_posts").joinpath(file_path).with_suffix(".md")
+        )
         self.stem = Path(self.file_path).stem.replace(" ", "%20")
-        print(self.stem)
-        with open(file_path, "r") as file:
+        with open(self.file_path, "r") as file:
             self.lines = file.readlines()
+
+    def rename_image_files(self):
+        image_dir = self.temp_folder.joinpath("assets").joinpath("images")
+        print(image_dir)
+        print(self.file_name)
+        subprocess.run(
+            [
+                "mv",
+                image_dir.joinpath(self.file_path.stem),
+                image_dir.joinpath(self.file_name),
+            ]
+        )
 
     def convert(self):
         self.process_header(self.lines)
         header = self.generate_header(self.title, self.tags)
-
         self.lines = self.fix_image_paths(self.lines)
-
         self.lines = self.lines[7:]
         self.lines = header + self.lines
+        self.rename_image_files()
         self.write()
 
     def process_header(self, lines: List[str]) -> List[str]:
         """Process header from notion markdown export to minimal mistakes format"""
-
         markdown_header = self.lines[:6]
         self.title = markdown_header[0].replace("\n", "").replace("#", "").strip()
         self.file_name = "".join(self.title.split())
@@ -93,13 +112,12 @@ class Markdown:
                     + line[start_index:]
                 )
                 lines[idx] = line.replace(self.stem, "").replace("%20", " ")
-
         return lines
 
     def write(self):
         date_string = datetime.now().strftime("%Y-%m-%d")
         filename = date_string + "-" + self.file_name + ".md"
-        with open(filename, "w") as out:
+        with open(self.temp_folder.joinpath("_posts").joinpath(filename), "w") as out:
             out.writelines(self.lines)
 
 
@@ -110,16 +128,14 @@ class Markdown:
 # move to website folder
 
 
-# or use github api
-posts_path = "~/Desktop/Website/ethankim00.github.io/_posts"
-images_path = "~/Desktop/Website"
-file_path = "./NoisyTune  65e31.md"
-md_file = Markdown(file_path)
-md_file.convert()
-image_file_path = file_path[:-3]
-
-
-subprocess.run(["mv", image_file_path, md_file.file_name + "/"])
+# # TODO replace with using gihtub or use github api
+# posts_path = "~/Desktop/Website/ethankim00.github.io/_posts"
+# images_path = "~/Desktop/Website"
+# file_path = "./NoisyTune  65e31.md"
+# md_file = Markdown(file_path)
+# md_file.convert()
+# image_file_path = file_path[:-3]
+# subprocess.run(["mv", image_file_path, md_file.file_name + "/"])
 
 
 def parse():
@@ -131,26 +147,23 @@ def parse():
         required=False,
     )
     parser.add_argument("--publish", type=bool, default=True)
+    return parser.parse_args()
 
 
 temp_folder = Path(__file__).parent.joinpath("tmp")
-
 if __name__ == "__main__":
     # default to reading latest file from dowloads folder
     args = parse()
-    if not args.input_file_path:
-        list_of_paths = Path("~/Downloads/").glob("*")
-        folder_path = max(list_of_paths, key=lambda p: p.stat().st_ctime)
-    else:
-        folder_path = Path(args.input_file_path)
-
     # copy markdown and image folder to local temp
-    dir_name = os.listdir(folder_path)
-    subprocess.run("cp", folder_path.joinpath("*.md"), temp_folder.joinpath("_posts"))
-    subprocess.run("cp", folder_path.joinpath(), temp_folder.joinpath("assets/images"))
-
+    file_path = fetch_export(args.input_file_path)
+    # file_path = Path("NoisyTune  65e31")
+    print(file_path)
     # run processing
-
-    # push to github
+    md_file = Markdown(file_path)
+    md_file.convert()
+    # TODO directly push to github
 
     # delete temp files
+    # temp_folder = Path(__file__).parent.joinpath("tmp")
+    # posts_path = temp_folder.joinpath("_posts")
+    # images_path = temp_folder.joinpath("assets/images")
