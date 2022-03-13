@@ -1,10 +1,5 @@
 ### Process Markdown downloaded from notion
 
-# Ideal Process
-# - get my Statistics/ML table
-# - list the most recent entries
-# - choose which page to download
-# - download the markdown file for that page
 import os
 import argparse
 import subprocess
@@ -116,26 +111,11 @@ class Markdown:
 
     def write(self):
         date_string = datetime.now().strftime("%Y-%m-%d")
-        filename = date_string + "-" + self.file_name + ".md"
-        with open(self.temp_folder.joinpath("_posts").joinpath(filename), "w") as out:
+        self.post_file_name = date_string + "-" + self.file_name + ".md"
+        with open(
+            self.temp_folder.joinpath("_posts").joinpath(self.post_file_name), "w"
+        ) as out:
             out.writelines(self.lines)
-
-
-# pain points
-# read export folder from downloads
-# rename image folder
-# replace %20 check
-# move to website folder
-
-
-# # TODO replace with using gihtub or use github api
-# posts_path = "~/Desktop/Website/ethankim00.github.io/_posts"
-# images_path = "~/Desktop/Website"
-# file_path = "./NoisyTune  65e31.md"
-# md_file = Markdown(file_path)
-# md_file.convert()
-# image_file_path = file_path[:-3]
-# subprocess.run(["mv", image_file_path, md_file.file_name + "/"])
 
 
 def parse():
@@ -162,8 +142,15 @@ if __name__ == "__main__":
     md_file = Markdown(file_path)
     md_file.convert()
     # TODO directly push to github
-
-    # delete temp files
-    # temp_folder = Path(__file__).parent.joinpath("tmp")
-    # posts_path = temp_folder.joinpath("_posts")
-    # images_path = temp_folder.joinpath("assets/images")
+    # TEMP manually move to website folder
+    logging.info("Copying to website repo")
+    file_name = md_file.file_name
+    post_file_name = md_file.post_file_name
+    temp_folder = Path(__file__).parent.joinpath("tmp")
+    post_path = temp_folder.joinpath("_posts").joinpath(post_file_name)
+    image_dir = temp_folder.joinpath("assets/images").joinpath(file_name)
+    website_path = Path("../../Website/ethankim00.github.io/")
+    website_post_path = website_path.joinpath("_posts").joinpath(post_file_name)
+    website_image_path = website_path.joinpath("assets/images").joinpath(file_name)
+    post_path.rename(website_post_path)
+    image_dir.rename(website_image_path)
