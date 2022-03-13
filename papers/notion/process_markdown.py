@@ -23,7 +23,6 @@ def fetch_export(file_path: str = None) -> Path:
         folder_path = Path(most_recent_folder)
     else:
         folder_path = folder_path.joinpath(file_path)
-    print(folder_path)
     markdown_path = next(folder_path.glob("*.md"))
     try:
         subprocess.run(["mv", markdown_path, temp_folder.joinpath("_posts")])
@@ -92,7 +91,7 @@ class Markdown:
             "tags:\n",
         ]
         for tag in tags:
-            header.append("\t" + "- " + tag + "\n")
+            header.append("    " + "- " + tag + "\n")
         header.append("---\n")
         return header
 
