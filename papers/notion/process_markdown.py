@@ -153,4 +153,4 @@ if __name__ == "__main__":
     website_image_path = website_path.joinpath("assets/images").joinpath(file_name)
     post_path.rename(website_post_path)
     image_dir.rename(website_image_path)
-    file_path.unlink()
+    file_path.with_suffix(".md").unlink()
