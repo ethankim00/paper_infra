@@ -14,6 +14,7 @@ logger.setLevel(logging.INFO)
 
 
 def fetch_export(file_path: str = None) -> Path:
+    # TODO deal with raw markdown files without images
     temp_folder = Path(__file__).parent.joinpath("tmp")
     folder_path = Path("../../../Downloads/")
     assert folder_path.is_dir()
@@ -153,4 +154,4 @@ if __name__ == "__main__":
     website_image_path = website_path.joinpath("assets/images").joinpath(file_name)
     post_path.rename(website_post_path)
     image_dir.rename(website_image_path)
-    file_path.with_suffix(".md").unlink()
+    temp_folder.joinpath("_posts").joinpath(file_path).with_suffix(".md").unlink()
