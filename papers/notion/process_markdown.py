@@ -66,10 +66,18 @@ class Markdown:
             ]
         )
 
+    def remove_strikethroughs(self, lines: List[str]):
+        """Remove strikethroughs from markdown"""
+        for idx, line in enumerate(lines):
+            if "::" in line:
+                lines[idx] = line.replace("~~", "")
+        return lines
+
     def convert(self):
         self.process_header(self.lines)
         header = self.generate_header(self.title, self.tags)
         self.lines = self.fix_image_paths(self.lines)
+        self.lines = self.remove_strikethroughs(self.lines)
         self.lines = self.lines[7:]
         self.lines = header + self.lines
         self.rename_image_files()
