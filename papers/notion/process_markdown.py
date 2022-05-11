@@ -70,7 +70,7 @@ class Markdown:
         """Remove strikethroughs from markdown"""
         for idx, line in enumerate(lines):
             if "::" in line:
-                lines[idx] = line.replace("~~", "")
+                lines[idx] = ""
         return lines
 
     def convert(self):
