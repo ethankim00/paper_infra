@@ -16,6 +16,7 @@ def invoke(request):
 
 
 def paper_to_anki(paper):
+    print(paper)
 
     request = {
         "action": "addNote",
@@ -51,7 +52,7 @@ def paper_to_anki(paper):
 
 if __name__ == "__main__":
 
-    papers = search_arxiv("natural language processing", "cs.CL")
+    papers = search_arxiv("information retrieval", "cs.CL")
 
     for paper in papers:
         query = paper_to_anki(paper)
