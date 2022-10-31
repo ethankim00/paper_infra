@@ -88,7 +88,7 @@ class Markdown:
         markdown_header = self.lines[:6]
         self.title = markdown_header[0].replace("\n", "").replace("#", "").strip()
         self.file_name = "".join(self.title.split())
-        self.tags = markdown_header[5][6:].strip().split(", ")
+        self.tags = markdown_header[5][6:].replace(":", "").strip().split(", ")
 
     def generate_header(self, title: str, tags: List[str]):
 
